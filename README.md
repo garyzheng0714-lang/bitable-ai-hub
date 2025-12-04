@@ -1,7 +1,78 @@
-# Getting Started
-- Run `npm install` to install dependencies
-- Run `npm start` to start server
-- Run `npm run dev` to test execute function
+# AI 大模型调用工具 (AIHub)
 
-# Publish
-Run `npm run pack` to create output/output.zip file
+这是一个为飞书/Lark 多维表格（Basekit）开发的字段捷径插件，允许用户直接在多维表格中调用各种主流 AI 大模型。支持自动算费、多模态输入（图片/视频）以及深度思考模式。
+
+## ✨ 核心特性
+
+- **多模型支持**：集成 OpenAI (GPT-4/5/o1), Claude, Gemini, DeepSeek, Grok, 通义千问 (Qwen), 豆包 (Doubao) 等数十种主流模型。
+- **自动算费**：内置主流模型价格表，支持根据 Token 用量自动计算预估花费（支持 USD 自动转 CNY，汇率预设 7.25）。
+- **多模态交互**：支持读取表格中的图片和视频附件/链接作为模型输入。
+- **深度思考适配**：针对 o1/o3/Doubao 等模型，支持配置 "reasoning_effort" 或深度思考模式。
+- **灵活配置**：支持自定义模型名称和 API Endpoint，兼容各种代理服务。
+
+## 🚀 快速开始 (Getting Started)
+
+### 开发环境
+
+1. **安装依赖**
+   ```bash
+   npm install
+   ```
+
+2. **启动本地服务器**
+   ```bash
+   npm start
+   ```
+
+3. **开发调试**
+   ```bash
+   npm run dev
+   ```
+
+### 部署发布
+
+生成发布包：
+```bash
+npm run pack
+```
+运行后将在 `output/` 目录下生成 `output.zip` 文件，可在飞书开发者后台上传发布。
+
+## 📝 配置说明
+
+在多维表格中添加此字段捷径后，需配置以下参数：
+
+| 参数名 | 说明 | 示例 |
+| :--- | :--- | :--- |
+| **输入指令** | (必填) 发送给 AI 的 Prompt 提示词。 | "请帮我总结这段文本..." |
+| **请求地址** | (必填) API 接口地址。支持 OpenAI 格式及兼容接口。 | `https://api.openai.com/v1/chat/completions` |
+| **模型名称** | (选填) 从预设列表中选择模型。 | `gpt-4o`, `claude-3-5-sonnet` |
+| **输入其他模型型号** | (选填) 手动输入模型名称。**如果同时选择了下拉项，将优先使用下拉项模型。** | `my-custom-model` |
+| **Apikey** | (必填) 对应服务商的 API Key。 | `sk-......` |
+| **图片内容** | (选填) 选择包含图片链接或附件的字段。 | (选择多维表格字段) |
+| **视频内容** | (选填) 选择包含视频链接或附件的字段。 | (选择多维表格字段) |
+| **是否进行深度思考** | (选填) 控制推理模型的思考强度。仅对支持 `reasoning_effort` 的模型生效。 | `AI 自动判断` / `进行深度思考` |
+
+## 📊 输出结果
+
+插件运行后将返回一个对象，包含以下信息（写入到多维表格列中）：
+
+- **输出结果**：AI 返回的主要文本内容。
+- **思考过程**：模型的思维链内容（如果模型支持并返回）。
+- **预估花费(元)**：根据 Token 用量和内置价格表估算的费用（CNY）。
+- **输入 Token**：Prompt 消耗的 Token 数。
+- **输出 Token**：Completion 消耗的 Token 数。
+
+## 🤖 支持模型列表 (部分)
+
+代码中已内置以下系列模型的价格和参数适配：
+
+- **Anthropic Claude**: Opus, Sonnet, Haiku (包含 3.5/3.7 等版本)
+- **OpenAI**: GPT-5 系列, GPT-4 系列, o1/o3/o4 推理系列
+- **Google Gemini**: 2.5/3 Pro, Flash
+- **DeepSeek**: R1
+- **xAI Grok**: Grok 3/4
+- **阿里云通义千问**: Qwen Turbo/Plus/Max/Long
+- **火山引擎豆包**: Doubao Pro/Lite
+
+---
+*注意：本工具仅作为连接器，实际 API 调用费用由对应的模型服务商收取。*

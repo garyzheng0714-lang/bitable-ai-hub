@@ -1,7 +1,7 @@
 {
   "name": "field-starter",
   "version": "1.0.0",
-  "description": "",
+  "description": "飞书多维表格 AI 大模型调用插件，支持 OpenAI/Claude/Gemini/DeepSeek 等多模型调用与自动算费。",
   "main": "index.js",
   "scripts": {
     "start": "block-basekit-cli start:field",
