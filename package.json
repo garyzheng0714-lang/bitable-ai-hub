@@ -13,6 +13,7 @@
   "license": "ISC",
   "devDependencies": {
     "@lark-opdev/block-basekit-cli": "1.0.5",
+    "@lark-opdev/cli": "3.3.3",
     "typescript": "^5.9.3"
   },
   "dependencies": {

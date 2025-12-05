@@ -1,7 +1,49 @@
 import { basekit, FieldType, FieldComponent, FieldCode, NumberFormatter, generateOptions } from '@lark-opdev/block-basekit-server-api';
 
 const feishuDm = ['feishu.cn', 'feishucdn.com', 'larksuitecdn.com', 'larksuite.com'];
-basekit.addDomainList([...feishuDm, 'api.openai.com', 'openai.azure.com', 'generativelanguage.googleapis.com', 'api.gptsapi.net', 'ark.cn-beijing.volces.com', 'dashscope.aliyuncs.com']);
+basekit.addDomainList([
+  ...feishuDm,
+  // OpenAI & Azure
+  'api.openai.com',
+  'openai.azure.com',
+  // Google
+  'generativelanguage.googleapis.com',
+  // Anthropic
+  'api.anthropic.com',
+  // DeepSeek
+  'api.deepseek.com',
+  // SiliconFlow (硅基流动)
+  'api.siliconflow.cn',
+  'api.siliconflow.com',
+  // Moonshot (Kimi)
+  'api.moonshot.cn',
+  // Zhipu AI (ChatGLM)
+  'open.bigmodel.cn',
+  // Aliyun (DashScope)
+  'dashscope.aliyuncs.com',
+  // Volcengine (Doubao/Ark)
+  'ark.cn-beijing.volces.com',
+  // Yi (01.AI)
+  'api.lingyiwanwu.com',
+  // Baichuan
+  'api.baichuan-ai.com',
+  // Minimax
+  'api.minimax.chat',
+  // StepFun
+  'api.stepfun.com',
+  // Groq
+  'api.groq.com',
+  // Mistral
+  'api.mistral.ai',
+  // OpenRouter
+  'openrouter.ai',
+  // Perplexity
+  'api.perplexity.ai',
+  // Together AI
+  'api.together.xyz',
+  // 代理/中转服务
+  'api.gptsapi.net'
+]);
 
 // 汇率：1 USD = 7.25 CNY (预估)
 const EXCHANGE_RATE = 7.25;
@@ -72,8 +114,36 @@ const PRICE_MAP: Record<string, { input: number, output: number, unit: '1k' | '1
 basekit.addField({
   formItems: [
     {
+      key: 'model',
+      label: '模型名称',
+      component: FieldComponent.SingleSelect,
+      validator: { required: false },
+      props: {
+        options: [
+          { label: 'gpt-5.1', value: 'gpt-5.1' },
+          { label: 'gemini-3-pro-preview', value: 'gemini-3-pro-preview' },
+          { label: 'gemini-2.5-pro', value: 'gemini-2.5-pro' },
+          { label: 'gemini-2.5-flash', value: 'gemini-2.5-flash' },
+          { label: '其他自定义模型', value: 'custom' }
+        ]
+      },
+      tooltips: [
+        { type: 'link', text: '【FBIF】AI大模型调用工具使用教程（必读）', link: 'https://foodtalks.feishu.cn/docx/LC6GdsT3uohkyIxvVr8cHT4DnCP' }
+      ]
+    },
+    {
+      key: 'model_custom',
+      label: '输入其他模型名称（非必填）',
+      component: FieldComponent.Input,
+      validator: { required: false },
+      props: { placeholder: '仅当上方选择“其他自定义模型”时生效' },
+      tooltips: [
+        { type: 'link', text: '点此查看模型列表', link: 'https://foodtalks.feishu.cn/docx/LC6GdsT3uohkyIxvVr8cHT4DnCP' }
+      ]
+    },
+    {
       key: 'instruction',
-      label: '输入指令',
+      label: '提示词（Prompt）',
       component: FieldComponent.Input,
       validator: { required: true },
       props: { placeholder: '请输入指令' }
@@ -83,85 +153,20 @@ basekit.addField({
       label: '请求地址',
       component: FieldComponent.Input,
       validator: { required: true },
-      props: { placeholder: 'https://api.openai.com/v1/responses' }
-    },
-    {
-      key: 'model',
-      label: '模型名称',
-      component: FieldComponent.SingleSelect,
-      validator: { required: false },
-      props: {
-        options: [
-          { label: 'claude-opus-4-5-20251101', value: 'claude-opus-4-5-20251101' },
-          { label: 'claude-sonnet-4-5-20250929', value: 'claude-sonnet-4-5-20250929' },
-          { label: 'claude-sonnet-4-5-20250929-thinking', value: 'claude-sonnet-4-5-20250929-thinking' },
-          { label: 'claude-haiku-4-5-20251001', value: 'claude-haiku-4-5-20251001' },
-          { label: 'gpt-5.1-codex', value: 'gpt-5.1-codex' },
-          { label: 'gpt-5.1-codex-mini', value: 'gpt-5.1-codex-mini' },
-          { label: 'gpt-5.1', value: 'gpt-5.1' },
-          { label: 'gpt-5.1-chat', value: 'gpt-5.1-chat' },
-          { label: 'gpt-5-codex', value: 'gpt-5-codex' },
-          { label: 'gpt-5-chat', value: 'gpt-5-chat' },
-          { label: 'gpt-5', value: 'gpt-5' },
-          { label: 'gpt-5-chat-latest', value: 'gpt-5-chat-latest' },
-          { label: 'gpt-5-mini', value: 'gpt-5-mini' },
-          { label: 'gpt-5-mini-2025-08-07', value: 'gpt-5-mini-2025-08-07' },
-          { label: 'gpt-5-nano', value: 'gpt-5-nano' },
-          { label: 'gpt-4.1', value: 'gpt-4.1' },
-          { label: 'gpt-4.1-2025-04-14', value: 'gpt-4.1-2025-04-14' },
-          { label: 'gpt-4.1-mini', value: 'gpt-4.1-mini' },
-          { label: 'gpt-4.1-nano', value: 'gpt-4.1-nano' },
-          { label: 'o4-mini', value: 'o4-mini' },
-          { label: 'gpt-4o', value: 'gpt-4o' },
-          { label: 'gpt-4o-2024-08-06', value: 'gpt-4o-2024-08-06' },
-          { label: 'gpt-4o-mini', value: 'gpt-4o-mini' },
-          { label: 'o3-mini', value: 'o3-mini' },
-          { label: 'o1', value: 'o1' },
-          { label: 'o1-mini', value: 'o1-mini' },
-          { label: 'text-embedding-ada-002', value: 'text-embedding-ada-002' },
-          { label: 'text-embedding-3-small', value: 'text-embedding-3-small' },
-          { label: 'text-embedding-3-large', value: 'text-embedding-3-large' },
-          { label: 'tts-1', value: 'tts-1' },
-          { label: 'tts-1-hd', value: 'tts-1-hd' },
-          { label: 'whisper-1', value: 'whisper-1' },
-          { label: 'dall-e-3', value: 'dall-e-3' },
-          { label: 'gemini-3-pro-image-preview', value: 'gemini-3-pro-image-preview' },
-          { label: 'gemini-3-pro-preview', value: 'gemini-3-pro-preview' },
-          { label: 'gemini-2.5-flash', value: 'gemini-2.5-flash' },
-          { label: 'gemini-2.5-flash-image-hd', value: 'gemini-2.5-flash-image-hd' },
-          { label: 'gemini-2.5-flash-lite', value: 'gemini-2.5-flash-lite' },
-          { label: 'gemini-2.5-pro', value: 'gemini-2.5-pro' },
-          { label: 'gemini-2.5-flash-nothinking', value: 'gemini-2.5-flash-nothinking' },
-          { label: 'deepseek-r1', value: 'deepseek-r1' },
-          { label: 'grok-4', value: 'grok-4' },
-          { label: 'grok-3-reasoner-r', value: 'grok-3-reasoner-r' },
-          { label: 'grok-3', value: 'grok-3' },
-          { label: 'grok-3-mini', value: 'grok-3-mini' },
-          { label: 'qwen-turbo', value: 'qwen-turbo' },
-          { label: 'qwen-plus', value: 'qwen-plus' },
-          { label: 'qwen-max', value: 'qwen-max' },
-          { label: 'qwen-long', value: 'qwen-long' },
-          { label: 'qwen-vl-max', value: 'qwen-vl-max' },
-          { label: 'qwen-vl-plus', value: 'qwen-vl-plus' }
-        ]
-      },
+      props: { placeholder: 'https://api.openai.com/v1/responses' },
       tooltips: [
-        { type: 'link', text: '点此查看模型列表', link: 'https://foodtalks.feishu.cn/docx/LC6GdsT3uohkyIxvVr8cHT4DnCP' }
+        { type: 'link', text: '【FBIF】AI大模型调用工具使用教程（必读）', link: 'https://foodtalks.feishu.cn/docx/LC6GdsT3uohkyIxvVr8cHT4DnCP' }
       ]
-    },
-    {
-      key: 'model_custom',
-      label: '输入其他模型型号',
-      component: FieldComponent.Input,
-      validator: { required: false },
-      props: { placeholder: '如同时选择了下拉项，将优先使用下拉项模型' }
     },
     {
       key: 'apikey',
       label: 'Apikey',
       component: FieldComponent.Input,
       validator: { required: true },
-      props: { placeholder: 'sk-...' }
+      props: { placeholder: 'sk-...' },
+      tooltips: [
+        { type: 'link', text: '【FBIF】AI大模型调用工具使用教程（必读）', link: 'https://foodtalks.feishu.cn/docx/LC6GdsT3uohkyIxvVr8cHT4DnCP' }
+      ]
     },
     {
       key: 'image_field',
@@ -203,7 +208,7 @@ basekit.addField({
         { key: 'thinking', type: FieldType.Text, label: '思考过程' },
         { key: 'input_tokens', type: FieldType.Number, label: '输入token', extra: { formatter: NumberFormatter.INTEGER } },
         { key: 'output_tokens', type: FieldType.Number, label: '输出token', extra: { formatter: NumberFormatter.INTEGER } },
-        { key: 'cost', type: FieldType.Number, label: '预估花费(元)' }
+        { key: 'cost', type: FieldType.Number, label: '预估花费(¥)', extra: { formatter: NumberFormatter.DIGITAL_ROUNDED_4 } }
       ]
     }
   },
@@ -254,7 +259,12 @@ basekit.addField({
         reasoning_mode
       } = formItemParams;
 
-      const finalModel = model || model_custom;
+      let selectedModel = (typeof model === 'object' ? (model as any).value : model);
+      // 如果选择了“其他自定义模型” (value: 'custom')，则将其视为未选择，从而让逻辑回退到使用 model_custom
+      if (selectedModel === 'custom') {
+        selectedModel = null;
+      }
+      const finalModel = selectedModel || model_custom;
 
       const toUrls = (v: any): string[] => {
         const out: string[] = [];
@@ -287,28 +297,38 @@ basekit.addField({
       const isGemini = /generativelanguage\.googleapis\.com$/.test(host) || request_url.includes(':generateContent');
       const isArk = /ark\.cn-beijing\.volces\.com$/.test(host);
       const isAliyun = /dashscope\.aliyuncs\.com$/.test(host);
+      const isGptsApi = /api\.gptsapi\.net$/.test(host);
 
-      if (/api\.openai\.com$/.test(host) || (/api\.gptsapi\.net$/.test(host) && !isGemini) || isArk || isAliyun) {
+      if (/api\.openai\.com$/.test(host) || (isGptsApi && !isGemini) || isArk || isAliyun) {
         headers = { ...headers, Authorization: `Bearer ${apikey}` };
-        body = { model: finalModel, messages: [{ role: 'user', content: inputText }] };
-        // OpenAI / Ark 均支持 messages 格式，Ark 必须用 messages
-        // 若是 OpenAI 旧版 text completion 可能需要 prompt，但现在一般都用 chat completion
-        // 这里统一用 chat 格式，如果用户请求地址是 completions (非chat)，则可能报错，但万能连接器假设用户会填对地址
         
-        // 兼容旧代码对 OpenAI 的处理（之前是 input: inputText），这里修正为标准 Chat 格式以适配 Ark
-        // 如果原意是兼容 responses API（自定义），则保持原样？
-        // 修正：OpenAI Responses API 是 { model, input } 吗？ 不，OpenAI 官方 Chat 是 { model, messages }
-        // 之前代码用了 { model, input } 可能是针对特定代理或简化？
-        // 查阅文档，OpenAI Chat Completions 是 messages。
-        // 之前代码：body = { model, input: inputText }; 可能是误写或适配了某特定 endpoint？
-        // 既然要适配 Ark（标准 OpenAI 兼容），这里改为标准 messages 结构。
-        // 但为了不破坏之前对 "https://api.openai.com/v1/responses" (假如有这个endpoint?) 的支持...
-        // 等等，用户之前填的是 /v1/responses 吗？OpenAI 官方没有 /v1/responses。
-        // 假设用户填的是 /v1/chat/completions。
-        
-        // 修正逻辑：
-        // 如果是 Ark 或 OpenAI Chat 接口，用 messages。
-        if (request_url.includes('/chat/completions') || isArk || isAliyun) {
+        if (isGptsApi) {
+          if (finalModel?.includes('gemini')) {
+            // GPTSAPI 针对 Gemini 模型使用标准 Chat 格式 (messages)
+            body = {
+              model: finalModel,
+              messages: [ { role: 'user', content: inputText } ],
+              max_tokens: 4000
+            };
+          } else {
+            // GPTSAPI 针对其他模型使用 input 格式
+            body = {
+              model: finalModel,
+              input: [
+                {
+                  role: 'user',
+                  content: [
+                    {
+                      type: 'input_text',
+                      text: inputText
+                    }
+                  ]
+                }
+              ],
+              max_tokens: 4000
+            };
+          }
+        } else if (request_url.includes('/chat/completions') || request_url.includes('/messages') || isArk || isAliyun) {
              body = { 
                  model: finalModel, 
                  messages: [ { role: 'user', content: inputText } ] 
@@ -362,23 +382,80 @@ basekit.addField({
       } else {
         // 优先尝试从 OpenAI Responses 格式 output[0].content[0].text 提取
         const outputItem = res?.output?.[0];
-        if (outputItem?.content?.[0]?.type === 'output_text') {
-            resultText = outputItem.content[0].text || '';
-        } else {
-            // 兜底：如果不是标准 output 结构，尝试 output_text 或 raw
-            resultText = (res?.output_text ?? res?.raw ?? '') as string;
-            if (!resultText && typeof res === 'object') resultText = JSON.stringify(res);
-        }
         
-        thinkingText = '';
+        // 1. GPTSAPI 的 input 格式返回结构 (res.output)
+        if (isGptsApi && Array.isArray(res?.output)) {
+            const outputItems = res.output || [];
+            resultText = outputItems
+              .map((item: any) => {
+                if (Array.isArray(item.content)) {
+                  return item.content
+                    .map((c: any) => c?.text || '')
+                    .join('');
+                }
+                return '';
+              })
+              .filter(Boolean)
+              .join('\n')
+              .trim();
 
-        // 从 usage 字段准确读取 token
-        if (res?.usage) {
-            inputTokens = res.usage.input_tokens || 0;
-            outputTokens = res.usage.output_tokens || 0;
-        } else {
-            inputTokens = estimateTokens(inputText);
-            outputTokens = resultText ? estimateTokens(resultText) : 0;
+            thinkingText = '';
+            if (res?.usage) {
+                inputTokens = res.usage.input_tokens || 0;
+                outputTokens = res.usage.output_tokens || 0;
+            } else {
+                inputTokens = estimateTokens(inputText);
+                outputTokens = resultText ? estimateTokens(resultText) : 0;
+            }
+        } 
+        // 2. GPTSAPI 的 messages 格式返回结构 (res.content, 类似于 Claude/Anthropic 风格或 OpenAI Chat 风格)
+        else if (isGptsApi && Array.isArray(res?.content)) {
+             resultText = res.content
+               .map((c: any) => c?.text || '')
+               .filter(Boolean)
+               .join('');
+             
+             thinkingText = '';
+             if (res?.usage) {
+                 inputTokens = res.usage.input_tokens || 0;
+                 outputTokens = res.usage.output_tokens || 0;
+             } else {
+                 inputTokens = estimateTokens(inputText);
+                 outputTokens = resultText ? estimateTokens(resultText) : 0;
+             }
+        }
+        // 3. 标准 OpenAI Chat Completion 格式 (choices[0].message.content)
+        else if (res?.choices?.[0]?.message?.content) {
+             resultText = res.choices[0].message.content;
+             
+             if (res?.usage) {
+                 inputTokens = res.usage.prompt_tokens || 0;
+                 outputTokens = res.usage.completion_tokens || 0;
+             } else {
+                 inputTokens = estimateTokens(inputText);
+                 outputTokens = resultText ? estimateTokens(resultText) : 0;
+             }
+        }
+        // 4. 其他情况 (如 output_text, raw 等)
+        else {
+            if (outputItem?.content?.[0]?.type === 'output_text') {
+                resultText = outputItem.content[0].text || '';
+            } else {
+                // 兜底：如果不是标准 output 结构，尝试 output_text 或 raw
+                resultText = (res?.output_text ?? res?.raw ?? '') as string;
+                if (!resultText && typeof res === 'object') resultText = JSON.stringify(res);
+            }
+            
+            thinkingText = '';
+    
+            // 从 usage 字段准确读取 token
+            if (res?.usage) {
+                inputTokens = res.usage.input_tokens || 0;
+                outputTokens = res.usage.output_tokens || 0;
+            } else {
+                inputTokens = estimateTokens(inputText);
+                outputTokens = resultText ? estimateTokens(resultText) : 0;
+            }
         }
       }
 
@@ -392,6 +469,8 @@ basekit.addField({
       };
 
       // Calculate Cost
+      // 使用 finalModel（用户选择的模型）而不是 API 返回的模型来查找价格
+      // API 返回的模型（如 gpt-5-2）可能只是内部负载均衡的别名，不影响计费标准
       const priceItem = PRICE_MAP[finalModel || ''];
       if (priceItem) {
           const divisor = priceItem.unit === '1k' ? 1000 : 1000000;
