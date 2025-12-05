@@ -1,0 +1,22 @@
+{
+  "name": "field-starter",
+  "version": "1.0.0",
+  "description": "飞书多维表格 AI 大模型调用插件，支持 OpenAI/Claude/Gemini/DeepSeek 等多模型调用与自动算费。",
+  "main": "index.js",
+  "scripts": {
+    "start": "block-basekit-cli start:field",
+    "build": "block-basekit-cli build:field",
+    "pack": "block-basekit-cli pack:field",
+    "dev": "block-basekit-cli dev:field"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@lark-opdev/block-basekit-cli": "1.0.5",
+    "@lark-opdev/cli": "3.3.3",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@lark-opdev/block-basekit-server-api": "1.0.6"
+  }
+}
